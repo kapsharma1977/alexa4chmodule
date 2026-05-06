@@ -1,8 +1,4 @@
-#ifndef H_RTCDS1307
-  #define H_RTCDS1307
-  #include "rtcds1307.h"
-#endif
-
+#include "rtcds1307.h"
 void ds1307rtc::initRTC(){
   // Initialize I2C on ESP8266 default pins: D2 (SDA) and D1 (SCL)
   if(_IsI2C()){
@@ -172,7 +168,6 @@ void ds1307rtc::checkandupdateRTC(bool connected, uint8_t attempts){ // once in 
       }
   }
 }
-
 String ds1307rtc::ddmmyyyy(uint8_t dd, uint8_t mm,uint16_t yyyy,char seaprator){
   char d[11];
   d[10] = '\0';

@@ -1,22 +1,9 @@
+#pragma once
 
-#ifndef H_MACROS
-  #define H_MACROS
-  #include "macros.h"
-#endif
-
-#ifndef H_ASYNCWEBSERVER
-  #define H_ASYNCWEBSERVER
-  #include <ESPAsyncWebServer.h>
-#endif
-#ifndef FAUXMOESP_H
-  #define FAUXMOESP_H
-  #include "fauxmoESP.h"
-#endif
-
-#ifndef H_PAGE
-  #define H_PAGE
-  #include "page.h"
-#endif
+#include "macros.h"
+#include <ESPAsyncWebServer.h>
+#include "fauxmoESP.h"
+#include "page.h"
 
 class serverFactory{
   fauxmoESP *_fauxmo;
@@ -48,8 +35,8 @@ class serverFactory{
       server->on("/wifi",HTTP_GET,wifiWebPage);
       server->on("/wifiap",HTTP_GET,wifiAPWebPage); 
       server->on("/devices",HTTP_GET,PageDeviesName);
-      // server->on("/week",HTTP_GET,weekpage);
-      // server->on("/time",HTTP_GET,timepage);
+      server->on("/week",HTTP_GET,weekpage);
+      server->on("/time",HTTP_GET,timepage);
       server->on("/commit",HTTP_GET,commitpage);
       server->on("/onof",HTTP_GET,manualonof);
       server->on("/alexa",HTTP_GET,alexa);
@@ -177,8 +164,6 @@ class serverFactory{
     bool Islocalserver(){return (_localserver != nullptr) ? true : false;}
     void deletelocalserver();
     void deletefauxmo();
-    //void setup_localserver();
-    //void setup_fauxmo();
     void fauxmoHandel(){if(_fauxmo != nullptr) _fauxmo->handle();}
     AsyncWebServer* getLocalServer(){return (_localserver != nullptr) ? _localserver : nullptr;}
     fauxmoESP* getFauxmo(){ return (_fauxmo != nullptr) ? _fauxmo : nullptr;}

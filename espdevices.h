@@ -1,96 +1,89 @@
-#ifndef H_DEVICESTUCT
-  #define H_DEVICESTUCT
-  #include "devicestruct.h"
-#endif
-#ifndef H_RTCDS1307
-  #define H_RTCDS1307
-  #include "rtcds1307.h"
-#endif
+#pragma once
 
-#ifndef H_DEVICE
-  #define H_DEVICE
-  #include "Device.h"
-#endif
-
-#ifndef H_ASYNCWEBSERVER
-  #define H_ASYNCWEBSERVER
-  #include <ESPAsyncWebServer.h>
-#endif
-#ifndef FAUXMOESP_H
-  #define FAUXMOESP_H
-  #include "fauxmoESP.h"
-#endif
-
-#ifndef H_MACROS
-  #define H_MACROS
-  #include "macros.h"
-#endif
+#include "macros.h"
+#include "mcupin.h"
+#include "devicestruct.h"
+#include "rtcds1307.h"
+#include "Device.h"
+//#include <ESPAsyncWebServer.h>
+//#include "fauxmoESP.h"
 
 
-// #ifndef RESET
-//   #define RESET          1
-// #endif
-// #ifndef NON_PATINING
-//   #define NON_PATINING      0
-// #endif
+// push button very short press count for DEBUG purpose only
+#ifndef VERYSHORTPRESS
+  #define VERYSHORTPRESS 3
+#endif
+// push button short press count for entring into Paring Mode for Alexa Device Discovery
+#ifndef SHORTPRESS
+  #define SHORTPRESS 9
+#endif
+
 extern struct DeviceStruct devwifieeprom;
 extern ds1307rtc rtc;
 
-class PushButton{
-  private:
-    uint8_t _gpio;
-    uint8_t _IOmode; // OUTPUT OR INPUT
-    bool _pull; // Pin is pulled-up(true) or pulld-down(false)
-    // button pressed counter
-    volatile uint8_t _bpc;
-    //volatile unsigned long lastmillis;
-  public:
-    PushButton(uint8_t gpio, uint8_t IOmode, uint8_t pull = true){_gpio = gpio; _IOmode = IOmode;_pull = pull;_bpc=0;}// default pulled up
-    bool isPressed(){ return ( (_pull && (digitalRead(_gpio) == 0)) || (!_pull && (digitalRead(_gpio) == 1)) ) ? true : false;}
-    // button pressed counter; zero if button is released
-    void inc_bpc(){_bpc = (_bpc >= 255) ? 0 : ++_bpc;}
-    uint8_t get_bpc() const {return _bpc;}
-    void clr_bpc(){_bpc=0;}
-};
-// bool PushButton::isPressed(){
-  
-//   if( (_pull && (digitalRead(_gpio) == 0)) || (!_pull && (digitalRead(_gpio) == 1)) ){
-//     _bpc = (_bpc >= 255) ? 0 : ++_bpc;
-//       return true;
-//   }
-//   else
-//     return false;
-  
-//   // if(_pull)
-//   //   if(digitalRead(_gpio) == 0){
-//   //     _bpc = (_bpc >= 255) ? 0 : ++_bpc;
-//   //     return true;
-//   //   }else
-//   //     return false;
-//   // else
-//   //   if(digitalRead(_gpio) == 1){
-//   //     _bpc = (_bpc >= 255) ? 0 : ++_bpc;
-//   //     return true;
-//   //   }else
-//   //     return false;
-// }
 class espDevices{
   private:
     void _D7GPIO13ButtonLoop();
   public:
     uint8_t *mcumode; // == //ALEXA_MODE, SCHEDULER_MODE or ONOF_MODE
-    uint8_t nonalexa_counter; // it will count to zero from 255 to check internet connection and update clock.
-    int D7resetpin; volatile unsigned long lastD7millis; volatile unsigned long clocksyncmillis;
-    uint8_t pair;
-    Device D_3, D_4, D_5, D_6;
-    PushButton D7;
-    espDevices(): D_3(D3_GPIO0),D_4(D4_GPIO2),D_5(D5_GPIO14),D_6(D6_GPIO12),D7(D7_GPIO13,INPUT){nonalexa_counter = NONALEXA_COUNTER; D7resetpin = 0;lastD7millis = 0;clocksyncmillis = 0;pair=0;}
-    //void setup();
+    volatile unsigned long lastD7millis; volatile unsigned long clocksyncmillis;
+    uint8_t pair; // Counter for device discovery in Alexa
+    Device D_3;// config :D3_GPIO0, no external resistor false, IOmode = OUTPUT, true(pull-up)) //Purpose: triggering rlay // Limitation/Boot Behavior : Pull-up during boot so flickering problum 
+    Device D_4;// config :D4_GPIO2, no external resistor false, IOmode = OUTPUT, true(pull-up)) //Purpose: triggering rlay // Limitation/Boot Behavior : Pull-up during boot so flickering problum 
+    Device D_5;// config :D5_GPIO14, no external resistor false, IOmode = OUTPUT, true(pull-up)) //Purpose: triggering rlay 
+    Device D_6; // config :D6_GPIO12, no external resistor false, IOmode = OUTPUT, true(pull-up)) //Purpose: triggering rlay
+    PushButton modes;
+    mcustatus statusled;
+    #if EXSITING_PCB
+    espDevices(): D_3(D3_GPIO0),D_4(D4_GPIO2),D_5(D5_GPIO14),D_6(D6_GPIO12) \
+      ,modes(D7_GPIO13,false,INPUT,true) \
+      ,statusled(D8_GPIO15,true,OUTPUT,false) \
+      { lastD7millis = 0;clocksyncmillis = 0;pair=0;}
+      // config :D7_GPIO13, no external resistor false, IOmode = INPUT, true(pull-up)) //Purpose: foR paring mode, fectory reset, and debug print
+      // config :D8_GPIO15,external resistor 10K true, IOmode = OUTPUT, false(pull-down)) //Purpose: mcu alexa state; led off alexa is connected; blinking then paring mode
+      // Important : 
+          // circuit connection is GND --- Push Button --- D7
+          // GND --- 10K --- D8
+          // GND --- 220ohm --- (- red led +) --- D8
+    #else // new PCB
+    espDevices(): D_3(D3_GPIO0),D_4(D4_GPIO2),D_5(D5_GPIO14),D_6(D6_GPIO12) \
+      ,statusled(D7_GPIO13,false,OUTPUT,true) \
+      ,modes(D8_GPIO15,true,INPUT,false) \
+      { lastD7millis = 0;clocksyncmillis = 0;pair=0;}
+      // config :D7_GPIO13, no external resistor false, IOmode = OUTPUT, true(pull-up)) //Purpose: mcu alexa state; led off alexa is connected; blinking then paring mode
+      // config :D8_GPIO15,external resistor 10K true, IOmode = INPUT, false(pull-down)) //Purpose: foR paring mode, fectory reset, and debug print
+      // Important : 
+          // circuit connection is 3.3v --- 220ohm --- (+ red led -) --- D7
+          // LOW(D7) : current will flow because D7 sinks current as it become GND
+          // HIGH : no current flow because D7 become source it will emit current at 3.3v so both end same voltage this emply no current
+    #endif
+    // // #if EXSITING_PCB
+    // // PushButton D7;// config :D7_GPIO13, no external resistor false, IOmode = INPUT, true(pull-up)) //Purpose: foR paring mode, fectory reset, and debug print
+    // // mcustatus D8; // D8_GPIO15,external resistor 10K true, IOmode = OUTPUT, false(pull-down)) //Purpose: mcu alexa state; led off alexa is connected; blinking then paring mode
+    // // espDevices(): D_3(D3_GPIO0),D_4(D4_GPIO2),D_5(D5_GPIO14),D_6(D6_GPIO12) \
+    // //   ,D7(D7_GPIO13,false,INPUT,true) \
+    // //   ,D8(D8_GPIO15,true,OUTPUT,false) \
+    // //   { lastD7millis = 0;clocksyncmillis = 0;pair=0;}
+    // // #else
+    // // mcustatus D7; // D8_GPIO15,external resistor 10K true, IOmode = OUTPUT, false(pull-down)) //Purpose: mcu alexa state; led off alexa is connected; blinking then paring mode
+    // // PushButton D8;// config :D7_GPIO13, no external resistor false, IOmode = INPUT, true(pull-up)) //Purpose: foR paring mode, fectory reset, and debug print
+    // // espDevices(): D_3(D3_GPIO0),D_4(D4_GPIO2),D_5(D5_GPIO14),D_6(D6_GPIO12) \
+    // //   // ,D7(D7_GPIO13,false,INPUT,true)
+    // //   // ,D8(D8_GPIO15,true,OUTPUT,false)
+    // //   ,D7(D7_GPIO13,false,INPUT,true) \
+    // //   ,D8(D8_GPIO15,true,OUTPUT,false) \
+    // //   { lastD7millis = 0;clocksyncmillis = 0;pair=0;}
+    // // #endif
+
+    // // espDevices(): D_3(D3_GPIO0),D_4(D4_GPIO2),D_5(D5_GPIO14),D_6(D6_GPIO12) \
+    // //   // ,D7(D7_GPIO13,false,INPUT,true)
+    // //   // ,D8(D8_GPIO15,true,OUTPUT,false)
+    // //   ,D7(D7_GPIO13,false,INPUT,true) \
+    // //   ,D8(D8_GPIO15,true,OUTPUT,false) \
+    // //   { lastD7millis = 0;clocksyncmillis = 0;pair=0;}
     void setup();
-    //void init(DeviceStruct& conf);
-    //void Loop(ds1307rtc & rtc, DeviceStruct& conf,bool IslocalServer, bool Isfauxmo);
     void Loop();
-    void Reset(){D_3.reset(); D_4.reset(); D_5.reset(); D_6.reset();}
+    void Reset(){D_3.reset(); D_4.reset(); D_5.reset(); D_6.reset();} // Alexa Device will be factory name 
     void FactoryRest(){ResetEEPROM(devwifieeprom);delay(500);ESP.reset();}
     
     void Enable(){D_3.setEnable(true);D_4.setEnable(true);D_5.setEnable(true); D_6.setEnable(true);} // call it to dissable alexa; bool      *_enable; // local(non alexa) on off schedule is enable or not; // do noting; logic for onof is disabled; device is controlled manualy or by alexa
@@ -132,6 +125,8 @@ class espDevices{
     // void clockSync(ds1307rtc& d1307rtc, uint8_t attempts = 5);
     // void esp_clocksync(DeviceStruct& conf,ds1307rtc& d1307rtc);
 
+    void OffAllDev();
+    void OnAllDev();
     void Print();
     void Print_status();
 };

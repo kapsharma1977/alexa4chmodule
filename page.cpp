@@ -1,28 +1,20 @@
-#ifndef H_PAGE
-#define H_PAGE
-  #include "page.h"
-#endif
-
-// #define COL_CARD(no, dev) \
-//   "<div class=\"column\"><div class=\"card\"><H3>" + String(no) + ". " + dev.getName() \
-//     + (nodemcu_esp.IsAlexaEnable() ? (dev.onof ? "<button class=\"pillbutton success\">ON</button>" : "<button class=\"pillbutton warning\">OFF</button>") : "") \
-//     + (nodemcu_esp.IsConfigEnable() ? (dev.onof ? "<button class=\"pillbutton default\">Disabled</button><p><a href=\"/onof?nf=0&gpio=" + String(dev.getgpio()) + "\" class=\"pillbutton success\" target=\"_self\">ON-Click to Off</a></p>" : "<button class=\"pillbutton default\">Disabled</button><p><a href=\"/onof?nf=1&gpio=" + String(dev.getgpio()) + "\" class=\"pillbutton warning\" target=\"_self\">OFF-Click to ON</a></p>") : "") \
-//     + "</H3>" + (dev.isday(MON) ? "<p>Monday</p>": "<p><del>Monday</del></p>") + (dev.isday(TUS) ? "<p>Tusday</p>": "<p><del>Tusday</del></p>") + (dev.isday(WED) ? "<p>Wednesday</p>": "<p><del>Wednesday</del></p>") + (dev.isday(THU) ? "<p>Thursday</p>": "<p><del>Thursday</del></p>") + (dev.isday(FRI) ? "<p>Friday</p>": "<p><del>Friday</del></p>") + (dev.isday(SAT) ? "<p>Saturday</p>": "<p><del>Saturday</del></p>") + (dev.isday(SUN) ? "<p>Sunday</p>": "<p><del>Sunday</del></p>") \
-//     + "<p>Off Timing: " + ds1307rtc::hhmmss(dev.getOffHour(), dev.getOffMinute(), 0) + "</p>" + " <p>On Timing: " + ds1307rtc::hhmmss(dev.getOnHour(),dev.getOnMinute(), 0) + "</p>" + (dev.IsFlip() ? "<p>Fliped</p>" : "<p><del>Fliped</del></p>") + "</div></div>"
+#include "page.h"
 
 #define COL_CARD(no, dev) \
   "<div class=\"column\"><div class=\"card\"><H3>" + String(no) + ". " + dev.getName() \
-    + (nodemcu_esp.IsAlexaEnable() ? (dev.onof ? "<button class=\"pillbutton success\">ON</button>" : "<button class=\"pillbutton warning\">OFF</button>") : "") \
-    + (nodemcu_esp.IsConfigEnable() ? (dev.onof ? "<button class=\"pillbutton default\">Disabled</button><p><a href=\"/onof?nf=0&gpio=" + String(dev.getgpio()) + "\" class=\"pillbutton success\" target=\"_self\">ON-Click to Off</a></p>" : "<button class=\"pillbutton default\">Disabled</button><p><a href=\"/onof?nf=1&gpio=" + String(dev.getgpio()) + "\" class=\"pillbutton warning\" target=\"_self\">OFF-Click to ON</a></p>") : "") \
+    + (nodemcu_esp.IsAlexaEnable() ? (dev.status() ? "<button class=\"pillbutton success\">ON</button>" : "<button class=\"pillbutton warning\">OFF</button>") : "") \
+    + (nodemcu_esp.IsConfigEnable() ? (dev.status() ? "<button class=\"pillbutton default\">Disabled</button><p><a href=\"/onof?nf=0&gpio=" + String(dev.getgpio()) + "\" class=\"pillbutton success\" target=\"_self\">ON-Click to Off</a></p>" : "<button class=\"pillbutton default\">Disabled</button><p><a href=\"/onof?nf=1&gpio=" + String(dev.getgpio()) + "\" class=\"pillbutton warning\" target=\"_self\">OFF-Click to ON</a></p>") : "") \
+    + "</H3>" + (dev.isday(MON) ? "<p>Monday</p>": "<p><del>Monday</del></p>") + (dev.isday(TUS) ? "<p>Tusday</p>": "<p><del>Tusday</del></p>") + (dev.isday(WED) ? "<p>Wednesday</p>": "<p><del>Wednesday</del></p>") + (dev.isday(THU) ? "<p>Thursday</p>": "<p><del>Thursday</del></p>") + (dev.isday(FRI) ? "<p>Friday</p>": "<p><del>Friday</del></p>") + (dev.isday(SAT) ? "<p>Saturday</p>": "<p><del>Saturday</del></p>") + (dev.isday(SUN) ? "<p>Sunday</p>": "<p><del>Sunday</del></p>") \
+    + "<p>Off Timing: " + ds1307rtc::hhmmss(dev.getOffHour(), dev.getOffMinute(), 0) + "</p>" + " <p>On Timing: " + ds1307rtc::hhmmss(dev.getOnHour(),dev.getOnMinute(), 0) + "</p>" + (dev.IsFlip() ? "<p>Fliped</p>" : "<p><del>Fliped</del></p>") \
     + "</div></div>"
 
 
 void defWebPage(AsyncWebServerRequest *request){
   String _nav = "<H1>DeziWebApp Systems Pvt. Ltd.</H1><H3>IoT Server Status</H3><div class=\"pill-nav\"><a class=\"active\" href=\"/\">Home</a><a href=\"/wifi\">Wifi</a><a href=\"/wifiap\">WifiAP</a><a href=\"/devices\">Devices</a><a href=\"/week\">Week Days</a><a href=\"/time\">On/Off Timings</a><a href=\"/commit\">Save All Changes</a><a href=\"/about\">About</a></div>";
     String _page = String("<H3>") + "Wifi SSID :- " + "<button class=\"pillbutton success\">" + String(devwifieeprom.ssid) + "</button>" + (WiFi.status() == WL_CONNECTED ? " is <button class=\"pillbutton success\">Connected</button>" : " is <button class=\"pillbutton warning\">Not Connected</button>")
+    + (rtc.RTC.isrunning() ? String(" Date: ") + String("<button class=\"pillbutton info\">") + String(rtc.date()) + "</button>" + " Time: " + "<button class=\"pillbutton info\">" + String(rtc.time()) + "</button><p>" : String("<button class=\"pillbutton danger\">") + "RTC is NOT running!" + "</button><p>")
     + (nodemcu_esp.IsAlexaEnable() ? "<button class=\"pillbutton warning\">Alexa enabled</button>" : "<a href=\"/alexa?enable=1\" class=\"pillbutton info\" target=\"_self\">Alexa Disabled--Click to Enable</a>" )
     + (nodemcu_esp.IsConfigEnable() ? "<button class=\"pillbutton warning\">Manual Mode</button>" : "<a href=\"/manual?enable=1\" class=\"pillbutton info\" target=\"_self\">Manual Mode Disabled--Click to Enable</a>")
-    //+ (nodemcu_esp.IsSchedulerMode() ? "<button class=\"pillbutton warning\">Schedular Mode</button>" : "<a href=\"/local?enable=1\" class=\"pillbutton info\" target=\"_self\">Schedular Mode Disabled--Click to Enable</a>")
     + "</H3><div class=\"row\">"
     + COL_CARD(1, nodemcu_esp.D_3)
     + COL_CARD(2, nodemcu_esp.D_4)
@@ -175,109 +167,109 @@ void PageDeviesName(AsyncWebServerRequest *request){
   }
   ESP.getFreeHeap();
 }
-// void weekpage(AsyncWebServerRequest *request){
-//   String _nav = "<H1>DeziWebApp Systems Pvt. Ltd.</H1><H3>IoT Server Status</H3><div class=\"pill-nav\"><a href=\"/\">Home</a><a href=\"/wifi\">Wifi</a><a href=\"/wifiap\">WifiAP</a><a href=\"/devices\">Devices</a><a class=\"active\" href=\"/week\">Week Days</a><a href=\"/time\">On/Off Timings</a><a href=\"/commit\">Save All Changes</a><a href=\"/about\">About</a></div>";
-//   if(request->args() == 0)
-//     request->send(200, "text/html", String(header_html) + "</style></head><body>" + _nav + String(week_body_html));
-//   else{ 
-//         uint8_t week = 0x00;
-//         if(request->hasParam(OLDPASS)){
-//           String op(request->getParam(OLDPASS)->value());
-//           String po(devwifieeprom.pass);
-//           DBGPRINTLN("Entered pass = %s",op);
-//           DBGPRINTLN(po);
-//           if(op != po){
-//             request->send(200, "text/html", String(header_html) + "</style></head><body><H2>Pervious Wifi Password Mismatch</H2>" + _nav + String(week_body_html));
-//             return;
-//           }
-//         }
-//         if(request->hasParam("0")){String MoN(request->getParam("0")->value());if(MoN == "Mon"){week = week | MON;}}
-//         if(request->hasParam("1")){String TuE(request->getParam("1")->value());if(TuE == "Tue"){week = week | TUS;}}
-//         if(request->hasParam("2")){String WeD(request->getParam("2")->value());if(WeD == "Wed"){week = week | WED;}}
-//         if(request->hasParam("3")){String ThU(request->getParam("3")->value());if(ThU == "Thu"){week = week | THU;}}
-//         if(request->hasParam("4")){String FrI(request->getParam("4")->value());if(FrI == "Fri"){week = week | FRI;}}
-//         if(request->hasParam("5")){String SaT(request->getParam("5")->value());if(SaT == "Sat"){week = week | SAT;}}
-//         if(request->hasParam("6")){String SuN(request->getParam("6")->value());if(SuN == "Sun"){week = week | SUN;}}
-//         // // for (uint8_t i = 2; i <= request->args(); i++){
-//         // //   if(request->argName(i) == "0"){String MoN(request->arg(i));if(MoN == "Mon"){week = week | MON;}}
-//         // //   if(request->argName(i) == "1"){String TuE(request->arg(i));if(TuE == "Tue"){week = week | TUS;}}
-//         // //   if(request->argName(i) == "2"){String WeD(request->arg(i));if(WeD == "Wed"){week = week | WED;}}
-//         // //   if(request->argName(i) == "3"){String ThU(request->arg(i));if(ThU == "Thu"){week = week | THU;}}
-//         // //   if(request->argName(i) == "4"){String FrI(request->arg(i));if(FrI == "Fri"){week = week | FRI;}}
-//         // //   if(request->argName(i) == "5"){String SaT(request->arg(i));if(SaT == "Sat"){week = week | SAT;}}
-//         // //   if(request->argName(i) == "6"){String SuN(request->arg(i));if(SuN == "Sun"){week = week | SUN;}}
-//         // // }
-//         ESP.getFreeHeap();        
-//         if(request->hasParam("dn")){
-//           String dev(request->getParam("dn")->value());
-//           if(dev == "1"){nodemcu_esp.D_3.setWeek(week);}
-//           if(dev == "2"){nodemcu_esp.D_4.setWeek(week);}
-//           if(dev == "3"){nodemcu_esp.D_5.setWeek(week);}
-//           if(dev == "4"){nodemcu_esp.D_6.setWeek(week);}
-//           defWebPage(request);
-//         }
-//       }
-// }
-// void timepage(AsyncWebServerRequest *request){
-//   String _nav = "<H1>DeziWebApp Systems Pvt. Ltd.</H1><H3>IoT Server Status</H3><div class=\"pill-nav\"><a href=\"/\">Home</a><a href=\"/wifi\">Wifi</a><a href=\"/wifiap\">WifiAP</a><a href=\"/devices\">Devices</a><a href=\"/week\">Week Days</a><a class=\"active\" href=\"/time\">On/Off Timings</a><a href=\"/commit\">Save All Changes</a><a href=\"/about\">About</a></div>";
-//   if(request->args() == 0)
-//     request->send(200, "text/html", String(header_html) + "</style></head><body>" + _nav +  String(time_body_html));
-//   else{ 
-//         if(request->hasParam(OLDPASS)){
-//           String op(request->getParam(OLDPASS)->value());
-//           String po(devwifieeprom.pass);
-//           DBGPRINTLN("Entered pass = %s",op);
-//           DBGPRINTLN(po);
-//           if(op != po){
-//             request->send(200, "text/html", String(header_html) + "</style></head><body><H2>Pervious Wifi Password Mismatch</H2>" + _nav + String(time_body_html));
-//             return;
-//           }
-//         }
+void weekpage(AsyncWebServerRequest *request){
+  String _nav = "<H1>DeziWebApp Systems Pvt. Ltd.</H1><H3>IoT Server Status</H3><div class=\"pill-nav\"><a href=\"/\">Home</a><a href=\"/wifi\">Wifi</a><a href=\"/wifiap\">WifiAP</a><a href=\"/devices\">Devices</a><a class=\"active\" href=\"/week\">Week Days</a><a href=\"/time\">On/Off Timings</a><a href=\"/commit\">Save All Changes</a><a href=\"/about\">About</a></div>";
+  if(request->args() == 0)
+    request->send(200, "text/html", String(header_html) + "</style></head><body>" + _nav + String(week_body_html));
+  else{ 
+        uint8_t week = 0x00;
+        if(request->hasParam(OLDPASS)){
+          String op(request->getParam(OLDPASS)->value());
+          String po(devwifieeprom.pass);
+          DBG_F("Entered pass = %s",op);
+          DBGPRINTLN(po);
+          if(op != po){
+            request->send(200, "text/html", String(header_html) + "</style></head><body><H2>Pervious Wifi Password Mismatch</H2>" + _nav + String(week_body_html));
+            return;
+          }
+        }
+        if(request->hasParam("0")){String MoN(request->getParam("0")->value());if(MoN == "Mon"){week = week | MON;}}
+        if(request->hasParam("1")){String TuE(request->getParam("1")->value());if(TuE == "Tue"){week = week | TUS;}}
+        if(request->hasParam("2")){String WeD(request->getParam("2")->value());if(WeD == "Wed"){week = week | WED;}}
+        if(request->hasParam("3")){String ThU(request->getParam("3")->value());if(ThU == "Thu"){week = week | THU;}}
+        if(request->hasParam("4")){String FrI(request->getParam("4")->value());if(FrI == "Fri"){week = week | FRI;}}
+        if(request->hasParam("5")){String SaT(request->getParam("5")->value());if(SaT == "Sat"){week = week | SAT;}}
+        if(request->hasParam("6")){String SuN(request->getParam("6")->value());if(SuN == "Sun"){week = week | SUN;}}
+        // for (uint8_t i = 2; i <= request->args(); i++){
+        //   if(request->argName(i) == "0"){String MoN(request->arg(i));if(MoN == "Mon"){week = week | MON;}}
+        //   if(request->argName(i) == "1"){String TuE(request->arg(i));if(TuE == "Tue"){week = week | TUS;}}
+        //   if(request->argName(i) == "2"){String WeD(request->arg(i));if(WeD == "Wed"){week = week | WED;}}
+        //   if(request->argName(i) == "3"){String ThU(request->arg(i));if(ThU == "Thu"){week = week | THU;}}
+        //   if(request->argName(i) == "4"){String FrI(request->arg(i));if(FrI == "Fri"){week = week | FRI;}}
+        //   if(request->argName(i) == "5"){String SaT(request->arg(i));if(SaT == "Sat"){week = week | SAT;}}
+        //   if(request->argName(i) == "6"){String SuN(request->arg(i));if(SuN == "Sun"){week = week | SUN;}}
+        // }
+        ESP.getFreeHeap();        
+        if(request->hasParam("dn")){
+          String dev(request->getParam("dn")->value());
+          if(dev == "1"){nodemcu_esp.D_3.setWeek(week);}
+          if(dev == "2"){nodemcu_esp.D_4.setWeek(week);}
+          if(dev == "3"){nodemcu_esp.D_5.setWeek(week);}
+          if(dev == "4"){nodemcu_esp.D_6.setWeek(week);}
+          defWebPage(request);
+        }
+      }
+}
+void timepage(AsyncWebServerRequest *request){
+  String _nav = "<H1>DeziWebApp Systems Pvt. Ltd.</H1><H3>IoT Server Status</H3><div class=\"pill-nav\"><a href=\"/\">Home</a><a href=\"/wifi\">Wifi</a><a href=\"/wifiap\">WifiAP</a><a href=\"/devices\">Devices</a><a href=\"/week\">Week Days</a><a class=\"active\" href=\"/time\">On/Off Timings</a><a href=\"/commit\">Save All Changes</a><a href=\"/about\">About</a></div>";
+  if(request->args() == 0)
+    request->send(200, "text/html", String(header_html) + "</style></head><body>" + _nav +  String(time_body_html));
+  else{ 
+        if(request->hasParam(OLDPASS)){
+          String op(request->getParam(OLDPASS)->value());
+          String po(devwifieeprom.pass);
+          DBG_F("Entered pass = %s",op);
+          DBGPRINTLN(po);
+          if(op != po){
+            request->send(200, "text/html", String(header_html) + "</style></head><body><H2>Pervious Wifi Password Mismatch</H2>" + _nav + String(time_body_html));
+            return;
+          }
+        }
         
-//         uint8_t onh,onm,ofh,ofm;bool enable_ = 1;bool flip_ = 0;
-//         if(request->hasParam("onh")){
-//           String oh(request->getParam("onh")->value());
-//           onh = (uint8_t)oh.toInt();
-//         }
-//         if(request->hasParam("onm")){
-//           String om(request->getParam("onm")->value());
-//           onm = (uint8_t)om.toInt();
-//         }
-//         if(request->hasParam("offh")){
-//           String oh(request->getParam("offh")->value());
-//           //DBGPRINTLN(oh);
-//           ofh = (uint8_t)oh.toInt();
-//           //DBGPRINTLN(ofh);
-//         }
-//         if(request->hasParam("offm")){
-//           String om(request->getParam("offm")->value());
-//           //DBGPRINTLN(om);
-//           ofm = (uint8_t)om.toInt();
-//           //DBGPRINTLN(ofm);
-//         }
+        uint8_t onh,onm,ofh,ofm;bool enable_ = 1;bool flip_ = 0;
+        if(request->hasParam("onh")){
+          String oh(request->getParam("onh")->value());
+          onh = (uint8_t)oh.toInt();
+        }
+        if(request->hasParam("onm")){
+          String om(request->getParam("onm")->value());
+          onm = (uint8_t)om.toInt();
+        }
+        if(request->hasParam("offh")){
+          String oh(request->getParam("offh")->value());
+          //DBGPRINTLN(oh);
+          ofh = (uint8_t)oh.toInt();
+          //DBGPRINTLN(ofh);
+        }
+        if(request->hasParam("offm")){
+          String om(request->getParam("offm")->value());
+          //DBGPRINTLN(om);
+          ofm = (uint8_t)om.toInt();
+          //DBGPRINTLN(ofm);
+        }
         
-//         if(request->hasParam("status")){
-//           String en(request->getParam("status")->value());
-//           if(en == "off")
-//             enable_ = false;
-//         }
-//         if(request->hasParam("flip")){
-//           String fl_ip(request->getParam("flip")->value());
-//           if(fl_ip == "on")
-//             flip_ = true;
-//         }
+        if(request->hasParam("status")){
+          String en(request->getParam("status")->value());
+          if(en == "off")
+            enable_ = false;
+        }
+        if(request->hasParam("flip")){
+          String fl_ip(request->getParam("flip")->value());
+          if(fl_ip == "on")
+            flip_ = true;
+        }
         
-//         if(request->hasParam("dn")){
-//           String dev(request->getParam("dn")->value());
-//           if(dev == "1"){nodemcu_esp.D_3.setOnHour(onh); nodemcu_esp.D_3.setOnMinute(onm); nodemcu_esp.D_3.setOffHour(ofh); nodemcu_esp.D_3.setOffMinute(ofm); nodemcu_esp.D_3.setEnable(enable_);nodemcu_esp.D_3.setFlip(flip_);}
-//           if(dev == "2"){nodemcu_esp.D_4.setOnHour(onh); nodemcu_esp.D_4.setOnMinute(onm); nodemcu_esp.D_4.setOffHour(ofh); nodemcu_esp.D_4.setOffMinute(ofm); nodemcu_esp.D_4.setEnable(enable_);nodemcu_esp.D_4.setFlip(flip_);}
-//           if(dev == "3"){nodemcu_esp.D_5.setOnHour(onh); nodemcu_esp.D_5.setOnMinute(onm); nodemcu_esp.D_5.setOffHour(ofh); nodemcu_esp.D_5.setOffMinute(ofm); nodemcu_esp.D_5.setEnable(enable_);nodemcu_esp.D_5.setFlip(flip_);}
-//           if(dev == "4"){nodemcu_esp.D_6.setOnHour(onh); nodemcu_esp.D_6.setOnMinute(onm); nodemcu_esp.D_6.setOffHour(ofh); nodemcu_esp.D_6.setOffMinute(ofm); nodemcu_esp.D_6.setEnable(enable_);nodemcu_esp.D_6.setFlip(flip_);}
-//         }
-//         //DBGPRINTLN("enable_ %d\n",enable_);
-//         defWebPage(request);
-//       }
-// }
+        if(request->hasParam("dn")){
+          String dev(request->getParam("dn")->value());
+          if(dev == "1"){nodemcu_esp.D_3.setOnHour(onh); nodemcu_esp.D_3.setOnMinute(onm); nodemcu_esp.D_3.setOffHour(ofh); nodemcu_esp.D_3.setOffMinute(ofm); nodemcu_esp.D_3.setEnable(enable_);nodemcu_esp.D_3.setFlip(flip_);}
+          if(dev == "2"){nodemcu_esp.D_4.setOnHour(onh); nodemcu_esp.D_4.setOnMinute(onm); nodemcu_esp.D_4.setOffHour(ofh); nodemcu_esp.D_4.setOffMinute(ofm); nodemcu_esp.D_4.setEnable(enable_);nodemcu_esp.D_4.setFlip(flip_);}
+          if(dev == "3"){nodemcu_esp.D_5.setOnHour(onh); nodemcu_esp.D_5.setOnMinute(onm); nodemcu_esp.D_5.setOffHour(ofh); nodemcu_esp.D_5.setOffMinute(ofm); nodemcu_esp.D_5.setEnable(enable_);nodemcu_esp.D_5.setFlip(flip_);}
+          if(dev == "4"){nodemcu_esp.D_6.setOnHour(onh); nodemcu_esp.D_6.setOnMinute(onm); nodemcu_esp.D_6.setOffHour(ofh); nodemcu_esp.D_6.setOffMinute(ofm); nodemcu_esp.D_6.setEnable(enable_);nodemcu_esp.D_6.setFlip(flip_);}
+        }
+        //DBG("enable_ %d\n",enable_);
+        defWebPage(request);
+      }
+}
 void commitpage(AsyncWebServerRequest *request){
   String _nav = "<H1>DeziWebApp Systems Pvt. Ltd.</H1><H3>IoT Server Status</H3><div class=\"pill-nav\"><a href=\"/\">Home</a><a href=\"/wifi\">Wifi</a><a href=\"/wifiap\">WifiAP</a><a href=\"/devices\">Devices</a><a href=\"/week\">Week Days</a><a href=\"/time\">On/Off Timings</a><a class=\"active\" href=\"/commit\">Save All Changes</a><a href=\"/about\">About</a></div>";
   if(request->method() == HTTP_GET){
@@ -325,25 +317,41 @@ void manualonof(AsyncWebServerRequest *request){ ///e.g. manulonof?nf=1&gpio=2
   else{
     if(request->hasParam("nf") && request->getParam("nf")->value().toInt() == O_N){
       // on
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D3_GPIO0)
-        nodemcu_esp.D_3.newonof = nodemcu_esp.D_3.On();
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D4_GPIO2)
-        nodemcu_esp.D_4.newonof = nodemcu_esp.D_4.On();
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D5_GPIO14)
-        nodemcu_esp.D_5.newonof = nodemcu_esp.D_5.On();
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D6_GPIO12)
-        nodemcu_esp.D_6.newonof = nodemcu_esp.D_6.On();
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D3_GPIO0){
+        nodemcu_esp.D_3.On();
+        nodemcu_esp.D_3.newonof = nodemcu_esp.D_3.status();
+      }
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D4_GPIO2){
+        nodemcu_esp.D_4.On();
+        nodemcu_esp.D_4.newonof = nodemcu_esp.D_4.status();
+      }
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D5_GPIO14){
+        nodemcu_esp.D_5.On();
+        nodemcu_esp.D_5.newonof = nodemcu_esp.D_5.status();
+      }
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D6_GPIO12){
+        nodemcu_esp.D_6.On();
+        nodemcu_esp.D_6.newonof = nodemcu_esp.D_6.status();
+      }
     }
     if(request->hasParam("nf") && request->getParam("nf")->value().toInt() == O_FF){
       // off
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D3_GPIO0)
-        nodemcu_esp.D_3.newonof = nodemcu_esp.D_3.Off();
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D4_GPIO2)
-        nodemcu_esp.D_4.newonof = nodemcu_esp.D_4.Off();
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D5_GPIO14)
-        nodemcu_esp.D_5.newonof = nodemcu_esp.D_5.Off();
-      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D6_GPIO12)
-        nodemcu_esp.D_6.newonof = nodemcu_esp.D_6.Off();
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D3_GPIO0){
+        nodemcu_esp.D_3.Off();
+        nodemcu_esp.D_3.newonof = nodemcu_esp.D_3.status();
+      }
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D4_GPIO2){
+        nodemcu_esp.D_4.Off();
+        nodemcu_esp.D_4.newonof = nodemcu_esp.D_4.status();
+      }
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D5_GPIO14){
+        nodemcu_esp.D_5.Off();
+        nodemcu_esp.D_5.newonof = nodemcu_esp.D_5.status();
+      }
+      if(request->hasParam("gpio") && request->getParam("gpio")->value().toInt() == D6_GPIO12){
+        nodemcu_esp.D_6.Off();
+        nodemcu_esp.D_6.newonof = nodemcu_esp.D_6.status();
+      }
     }
     defWebPage(request);
   }

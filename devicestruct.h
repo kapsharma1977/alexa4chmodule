@@ -1,20 +1,10 @@
+#pragma once
+
+#include "macros.h"
+#include <ESP_EEPROM.h>
+#include "encryp.h"
 // https://github.com/jwrw/ESP_EEPROM
-#ifndef H_ARDUINO
-#define H_ARDUINO
-  #include <Arduino.h>
-#endif
-#ifndef H_MACROS
-  #define H_MACROS
-  #include "macros.h"
-#endif
-#ifndef H_ESP_EEPROM
-#define H_ESP_EEPROM
-  #include <ESP_EEPROM.h>
-#endif
-#ifndef H_ENCRYP
-  #define H_ENCRYP
-  #include "encryp.h"
-#endif
+
 
 struct DeviceStruct {
   char  ssid[LEN]; // encrypted       16 bytes

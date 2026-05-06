@@ -1,7 +1,4 @@
-#ifndef H_ENCRYP
-  #define H_ENCRYP
-  #include "encryp.h"
-#endif
+#include "encryp.h"
 
 encryp::encryp(){
   key = (char *)malloc((LEN+1)*sizeof(char)); // one for null char

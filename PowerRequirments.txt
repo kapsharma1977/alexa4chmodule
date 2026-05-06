@@ -1,0 +1,13 @@
+Wemos D1 Mini Current Consumption
+	*Peak Power Spikes (WiFi/Boot): During WiFi initialization, RF calibration, or data transmission, the Wemos D1 Mini can experience instantaneous spikes of 400mA to 500mA.
+		~80mA		500mA (WiFi Spikes)
+
+System Requirements with 4-Channel Relay
+		~280mA		300mA
+
+Total System	(Average Current)~360mA		(Peak/Max Current)~800mA
+
+Power Supply Recommendations
+	*Use a 1A or 2A Supply: A standard 5V 2A SMPS adapter is highly recommended to provide enough "headroom" for the WiFi spikes and all four relays.
+	*Filtering Capacitors: If you experience random resets when the relays click, adding a large electrolytic capacitor (e.g., 470µF or 1000µF) across the 5V and GND pins can help smooth out the voltage dips caused by these sudden current demands.
+	*Avoid USB-only Power: Standard computer USB ports are often limited to 500mA, which may not be enough to reliably trigger all four relays and maintain a WiFi connection simultaneously.

@@ -1,8 +1,5 @@
+#include "devicestruct.h"
 
-#ifndef H_DEVICESTUCT
-  #define H_DEVICESTUCT
-  #include "devicestruct.h"
-#endif
 void wipe_eeprom(){
   // It is still necessary to call begin
   // or no wipe will be performed

@@ -1,21 +1,10 @@
+#pragma once
 // This is Tiny RTC Real Time Clock DS1307 I2C IIC Module for Arduino. 
 // It also has an Atmel 24C32 EEPROM chip. 56 Bytes of Non-volatile memory available to the user. 4KB of serial electrically erasable and programmable read-only memory (EEPROM)
-#ifndef H_ARDUINO
-  #define H_ARDUINO
-  #include <Arduino.h>
-#endif
-#ifndef H_MACROS
-  #define H_MACROS
-  #include "macros.h"
-#endif
-#ifndef H_RTCLIB
-  #define H_RTCLIB
-  #include "RTClib.h"
-#endif
-#ifndef H_DEVICESTUCT
-  #define H_DEVICESTUCT
-  #include "devicestruct.h"
-#endif
+#include "macros.h"
+#include "RTClib.h"
+#include "devicestruct.h"
+
 extern struct DeviceStruct devwifieeprom;
 
 #include <at24c32.h>
@@ -23,12 +12,10 @@ extern struct DeviceStruct devwifieeprom;
 #define DS1307_I2C_ADDRESS 0x68
 #define HOURS_REGISTER 0x02 // To verify if your DS1307 is in 24-hour mode, you must check Bit 6 of register 02h (the Hours register); Bit 6 = 0: 24-hour mode is active
 
-///  #define D1_GPIO5 5  often used as SCL (I2C)
-///  #define D2_GPIO4 4  often used as SDA (I2C)
 #include <Wire.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-//#include <SPI.h>  // not used here, but needed to prevent a RTClib compile error
+
 #define RTC_NO_DAY 255
 
 class ds1307rtc{

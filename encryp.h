@@ -1,23 +1,6 @@
-#ifndef H_MACROS
-  #define H_MACROS
-  #include "macros.h"
-#endif
+#pragma once
 
-// #ifndef H_ARDUINO
-//   #define H_ARDUINO
-//   #include <Arduino.h>
-// #endif
-// #ifdef ESP32
-//   #include <WiFi.h>
-// #else
-//   #ifndef H_ESP8266WiFi
-//     #define H_ESP8266WiFi
-//     #include <ESP8266WiFi.h>
-//   #endif
-// #endif
-// #ifndef LEN
-//   #define LEN 16
-// #endif
+#include "macros.h"
 
 class encryp {
   char *key;

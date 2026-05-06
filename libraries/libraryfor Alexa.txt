@@ -1,0 +1,5 @@
+ESPAsyncTCP; ESP32Async/ESPAsyncTCP @ 2.0.0 (ESP8266)
+	https://github.com/ESP32Async/ESPAsyncTCP
+
+ESPAsyncWebServer; ESP32Async/ESPAsyncWebServer @ 3.10.0 (ESP32, ESP8266, RP2040)
+	https://github.com/ESP32Async/ESPAsyncWebServer
